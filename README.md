@@ -1,2 +1,2 @@
 # agh-database
-Test
+Database Course
