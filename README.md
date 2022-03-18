@@ -1,2 +1,0 @@
-# agh-database
-Test
