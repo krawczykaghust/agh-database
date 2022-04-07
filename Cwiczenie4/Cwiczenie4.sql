@@ -2,27 +2,30 @@ USE firma;
 GO
 
 
+
 --1. Tworzenie bazy danych o nazwie firma
 
 CREATE DATABASE firma;
+GO
+
 
 --2. Tworzenie schematu o nazwie rozliczenia (zak³adka Security)
 
-GO
+
 
 CREATE SCHEMA rozliczenia;
-
 GO
 --3. Dodanie do schematu 'rozliczenia' cztery tabele
 
 	-- pracownicy(id_pracownika, imie, nazwisko, adres, telefon) 
 
+
 CREATE TABLE rozliczenia.pracownicy(
 	
 	id_pracownika CHAR(6) PRIMARY KEY,
-	imie VARCHAR(80) NOT NULL,
-	nazwisko VARCHAR(80) NOT NULL,
-	adres VARCHAR(50) NOT NULL,
+	imie NVARCHAR(80) NOT NULL,
+	nazwisko NVARCHAR(80) NOT NULL,
+	adres NVARCHAR(50) NOT NULL,
 	telefon CHAR(12) NULL,
 );
 
@@ -44,12 +47,10 @@ CREATE TABLE rozliczenia.godziny(
 CREATE TABLE rozliczenia.pensje(
 	
 	id_pensji CHAR(6) PRIMARY KEY,
-	stanowisko VARCHAR(80) NOT NULL,
+	stanowisko NVARCHAR(80) NOT NULL,
 	kwota SMALLMONEY NOT NULL,
 	id_premii CHAR(6) NULL
 );
-
-
 
 
 
@@ -59,7 +60,7 @@ CREATE TABLE rozliczenia.pensje(
 CREATE TABLE rozliczenia.premie(
 	
 	id_premii CHAR(6) PRIMARY KEY,
-	rodzaj VARCHAR(80) NULL,
+	rodzaj NVARCHAR(80) NULL,
 	kwota SMALLMONEY NULL,
 );
 
@@ -400,7 +401,8 @@ SELECT pracownicy.nazwisko, pracownicy.adres FROM rozliczenia.pracownicy
 -- 6. Napisz zapytanie, które przekonwertuje datê w tabeli godziny tak, aby wyœwietlana by³a
 -- informacja jaki to dzieñ tygodnia i jaki miesi¹c (funkcja DATEPART x2).
 
-SELECT DATEPART(ww, godziny.data) [week],
+
+SELECT DATEPART(day, godziny.data) [day],
 	DATEPART(month, godziny.data) [month]
 FROM rozliczenia.godziny
 
@@ -408,7 +410,7 @@ FROM rozliczenia.godziny
 
 SELECT 
 	godziny.data,
-	DATEPART(ww, godziny.data) [week],
+	DATEPART(day, godziny.data) [day],
 	DATEPART(month, godziny.data) [month]
 FROM rozliczenia.godziny
 
@@ -420,11 +422,7 @@ FROM rozliczenia.godziny
 EXEC sp_rename 'rozliczenia.pensje.kwota', 'kwota_brutto';
 
 
-
-
 ALTER TABLE rozliczenia.pensje 
-	ADD kwota_netto AS (pensje.kwota_brutto*1.19)
+	ADD kwota_netto AS (pensje.kwota_brutto*0.81)
 
 
-
-SELECT * FROM rozliczenia.pensje
