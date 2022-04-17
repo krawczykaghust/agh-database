@@ -248,6 +248,12 @@ INNER JOIN ksiegowosc.Godziny AS g
 ON w.id_godziny = g.id_godziny
 
 
+-- ALTER TABLE ksiegowosc.godziny ADD liczba_nadgodzin INT;
+-- UPDATE ksiegowosc.godziny SET liczba_nadgodzin = liczba_godzin-160
+-- WHERE ksiegowosc.godziny.liczba_godzin > 160;
+
+
+
 -- g)  Wyświetl imię i nazwisko pracowników, których pensja zawiera się w przedziale 1500 – 3000 PLN.
 
 
@@ -320,6 +326,7 @@ GROUP BY p2.stanowisko
 
 SELECT 
 	p2.stanowisko,
+	AVG(p2.kwota::numeric) AS srednia_placa,
 	MIN(p2.kwota) AS minimalna_placa,
 	MAX(p2.kwota) AS maksymalna_placa
 FROM ksiegowosc.Pracownicy AS p1
@@ -375,10 +382,17 @@ GROUP BY p2.stanowisko
 
 --DELETE POPRAWIC
 
-DELETE T1, T2
-FROM T1
-INNER JOIN T2 
-ON T1.key = T2.key
-WHERE condition;
+
+DELETE 
+FROM ksiegowosc.Pracownicy AS p1
+USING ksiegowosc.Wynagrodzenie AS w, ksiegowosc.Pensja AS p2
+WHERE 
+	p1.id_pracownika = w.id_pracownika AND
+	w.id_pensji = p2.id_pensji AND
+	p2.kwota < cast(1500 AS money);
 
 
+-- Test Select
+
+SELECT *
+FROM ksiegowosc.Pracownicy
