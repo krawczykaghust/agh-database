@@ -160,18 +160,20 @@ COMMENT ON SCHEMA ksiegowosc IS 'Schemat Księgowości w małej firmie, dla któ
 	('8', 'Analityk', '15000'),
 	('9', 'Analityk', '2000');
 	
+
+
 	
 	INSERT INTO ksiegowosc.Premia VALUES
 	('0', 'Zadaniowa', '500'),
 	('1', 'Motywacyjna', '100'),
 	('2', 'Zadaniowa', '500'),
-	('3', 'Uznaniowa', NULL),
+	('3', NULL, NULL),
 	('4', 'Motywacyjna', '100'),
 	('5', 'Wynikowa', '1000'),
 	('6', 'Zadaniowa', NULL),
 	('7', 'Wynikowa', '1500'),
-	('8', 'Wynikowa', '1000'),
-	('9', 'Uznaniowa', '200');
+	('8', NULL, NULL),
+	('9', NULL, NULL);
 	
 	
 	
@@ -252,6 +254,16 @@ ON w.id_godziny = g.id_godziny
 -- UPDATE ksiegowosc.godziny SET liczba_nadgodzin = liczba_godzin-160
 -- WHERE ksiegowosc.godziny.liczba_godzin > 160;
 
+
+--SELECT p1.imie, p1.nazwisko, g.liczba_nadgodzin, p3.kwota
+--FROM ksiegowosc.Pracownicy AS p1
+--INNER JOIN ksiegowosc.Wynagrodzenie AS w
+--ON p1.id_pracownika = w.id_pracownika	
+--INNER JOIN ksiegowosc.Godziny AS g
+--ON w.id_godziny = g.id_godziny
+--INNER JOIN ksiegowosc.Premia AS p3
+--ON w.id_premii = p3.id_premii
+--WHERE g.liczba_nadgodzin IS NOT NULL AND p3.kwota IS NULL;
 
 
 -- g)  Wyświetl imię i nazwisko pracowników, których pensja zawiera się w przedziale 1500 – 3000 PLN.
