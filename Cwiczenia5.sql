@@ -49,7 +49,7 @@ COMMENT ON SCHEMA ksiegowosc IS 'Schemat Księgowości w małej firmie, dla któ
 	);
 	
 	ALTER TABLE ksiegowosc.Godziny
-	ADD FOREIGN KEY (id_pracownika) REFERENCES ksiegowosc.Pracownicy(id_pracownika);
+	ADD FOREIGN KEY (id_pracownika) REFERENCES ksiegowosc.Pracownicy(id_pracownika) ON DELETE CASCADE;
 
 	
 	
@@ -103,10 +103,10 @@ COMMENT ON SCHEMA ksiegowosc IS 'Schemat Księgowości w małej firmie, dla któ
 	
 	
 	ALTER TABLE ksiegowosc.Wynagrodzenie
-		ADD FOREIGN KEY (id_pracownika) REFERENCES ksiegowosc.Pracownicy(id_pracownika),
-		ADD FOREIGN KEY (id_godziny) REFERENCES ksiegowosc.Godziny(id_godziny),
-		ADD FOREIGN KEY (id_pensji) REFERENCES ksiegowosc.Pensja(id_pensji),
-		ADD FOREIGN KEY (id_premii) REFERENCES ksiegowosc.Premia(id_premii);
+		ADD FOREIGN KEY (id_pracownika) REFERENCES ksiegowosc.Pracownicy(id_pracownika) ON DELETE CASCADE,
+		ADD FOREIGN KEY (id_godziny) REFERENCES ksiegowosc.Godziny(id_godziny) ON DELETE CASCADE,
+		ADD FOREIGN KEY (id_pensji) REFERENCES ksiegowosc.Pensja(id_pensji) ON DELETE CASCADE,
+		ADD FOREIGN KEY (id_premii) REFERENCES ksiegowosc.Premia(id_premii) ON DELETE CASCADE;
 		
 	
 	
@@ -121,6 +121,12 @@ COMMENT ON SCHEMA ksiegowosc IS 'Schemat Księgowości w małej firmie, dla któ
 	
 	-- 4. Wypełnij każdą tabelę 10. rekordami.
 	
+	       -- DROP TABLE ksiegowosc.Pracownicy CASCADE
+	       -- DROP TABLE ksiegowosc.Wynagrodzenie CASCADE
+	       -- DROP TABLE ksiegowosc.Pensja
+	       -- DROP TABLE ksiegowosc.Premia
+	       -- DROP TABLE ksiegowosc.Godziny
+	
 	
 	INSERT INTO ksiegowosc.Pracownicy VALUES
 	('0', 'Aleksandra', 'Nowak', 'ul.Kwiatowa 2, 32-043, Krakow', '721 543 621'),
@@ -132,7 +138,7 @@ COMMENT ON SCHEMA ksiegowosc IS 'Schemat Księgowości w małej firmie, dla któ
 	('6', 'Anna', 'Lewandowska', 'ul.Akacjowa 5, 35-143, Krakow', '722 113 142'),
 	('7', 'Karolina', 'Kowalczyk', 'ul.Warszawska 11, 31-021, Krakow', '546 133 311'),
 	('8', 'Michał', 'Brzoza', 'ul.Wierzbowa 23, 33-123, Krakow', '726 323 431'),
-	('9', 'Iwona', 'Szymańska', 'ul.Włoska 16, 30-043, Krakow', '656 423 5421');
+	('9', 'Janina', 'Szymańska', 'ul.Włoska 16, 30-043, Krakow', '656 423 5421');
 	
 	INSERT INTO ksiegowosc.Godziny VALUES
 	('0', '2022-03-12', '150', '0'),
@@ -149,7 +155,7 @@ COMMENT ON SCHEMA ksiegowosc IS 'Schemat Księgowości w małej firmie, dla któ
 	
 	
 	INSERT INTO ksiegowosc.Pensja VALUES
-	('0', 'Programista', '14000'),
+	('0', 'Programista', '2500'),
 	('1', 'Admiinistrator', '10000'),
 	('2', 'Programista', '8000'),
 	('3', 'Admiinistrator', '30000'),
@@ -158,7 +164,7 @@ COMMENT ON SCHEMA ksiegowosc IS 'Schemat Księgowości w małej firmie, dla któ
 	('6', 'Analityk', '25000'),
 	('7', 'Programista', '17000'),
 	('8', 'Analityk', '15000'),
-	('9', 'Analityk', '2000');
+	('9', 'Analityk', '700');
 	
 
 
@@ -170,7 +176,7 @@ COMMENT ON SCHEMA ksiegowosc IS 'Schemat Księgowości w małej firmie, dla któ
 	('3', NULL, NULL),
 	('4', 'Motywacyjna', '100'),
 	('5', 'Wynikowa', '1000'),
-	('6', 'Zadaniowa', NULL),
+	('6', NULL, NULL),
 	('7', 'Wynikowa', '1500'),
 	('8', NULL, NULL),
 	('9', NULL, NULL);
@@ -193,7 +199,7 @@ COMMENT ON SCHEMA ksiegowosc IS 'Schemat Księgowości w małej firmie, dla któ
 
 -- a) Wyświetl tylko id pracownika oraz jego nazwisko.
 
-SELECT ksiegowosc.Pracownicy.id_pracownika, ksiegowosc.Pracownicy.imie
+SELECT ksiegowosc.Pracownicy.id_pracownika, ksiegowosc.Pracownicy.nazwisko
 FROM ksiegowosc.Pracownicy
 
 -- b) Wyświetl id pracowników, których płaca jest większa niż 1000.
@@ -205,7 +211,7 @@ INNER JOIN ksiegowosc.Wynagrodzenie AS w
 ON p1.id_pracownika = w.id_pracownika
 INNER JOIN ksiegowosc.Pensja AS p2
 ON w.id_pensji = p2.id_pensji
-WHERE p2.kwota > cast(20000 AS money)
+WHERE p2.kwota > cast(1000 AS money)
 
 
 
@@ -220,50 +226,35 @@ INNER JOIN ksiegowosc.Pensja AS p2
 ON w.id_pensji = p2.id_pensji
 INNER JOIN ksiegowosc.Premia AS p3
 ON w.id_premii = p3.id_premii
-WHERE p2.kwota > cast(20000 AS money) AND p3.kwota IS NULL
+WHERE p2.kwota > cast(2000 AS money) AND p3.kwota IS NULL
 
 
 -- d) Wyświetl pracowników, których pierwsza litera imienia zaczyna się na literę ‘J’. 
 
-SELECT ksiegowosc.Pracownicy.id_pracownika, ksiegowosc.Pracownicy.imie, ksiegowosc.Pracownicy.nazwisko
+SELECT *
 FROM ksiegowosc.Pracownicy
-WHERE ksiegowosc.Pracownicy.imie LIKE 'L%'
+WHERE ksiegowosc.Pracownicy.imie LIKE 'J%'
 
 
 -- e) Wyświetl pracowników, których nazwisko zawiera literę ‘n’ oraz imię kończy się na literę ‘a’.
 	
-SELECT ksiegowosc.Pracownicy.id_pracownika, ksiegowosc.Pracownicy.imie, ksiegowosc.Pracownicy.nazwisko
+SELECT *
 FROM ksiegowosc.Pracownicy
-WHERE ksiegowosc.Pracownicy.nazwisko LIKE '%n%a'
+WHERE ksiegowosc.Pracownicy.nazwisko LIKE '%n%' AND ksiegowosc.Pracownicy.imie LIKE '%a';
 
 
 -- f) Wyświetl imię i nazwisko pracowników oraz liczbę ich nadgodzin, przyjmując, iż standardowy czas pracy to 160 h miesięcznie. 
 
-SELECT p1.imie, p1.nazwisko, g.liczba_godzin,
+SELECT p1.imie, p1.nazwisko,
 CASE
 	WHEN (g.liczba_godzin > 160) THEN liczba_godzin-160
+	WHEN (g.liczba_godzin <= 160) THEN 0
 END AS nadgodziny
 FROM ksiegowosc.Pracownicy AS p1
 INNER JOIN ksiegowosc.Wynagrodzenie AS w
 ON p1.id_pracownika = w.id_pracownika	
 INNER JOIN ksiegowosc.Godziny AS g
 ON w.id_godziny = g.id_godziny
-
-
--- ALTER TABLE ksiegowosc.godziny ADD liczba_nadgodzin INT;
--- UPDATE ksiegowosc.godziny SET liczba_nadgodzin = liczba_godzin-160
--- WHERE ksiegowosc.godziny.liczba_godzin > 160;
-
-
---SELECT p1.imie, p1.nazwisko, g.liczba_nadgodzin, p3.kwota
---FROM ksiegowosc.Pracownicy AS p1
---INNER JOIN ksiegowosc.Wynagrodzenie AS w
---ON p1.id_pracownika = w.id_pracownika	
---INNER JOIN ksiegowosc.Godziny AS g
---ON w.id_godziny = g.id_godziny
---INNER JOIN ksiegowosc.Premia AS p3
---ON w.id_premii = p3.id_premii
---WHERE g.liczba_nadgodzin IS NOT NULL AND p3.kwota IS NULL;
 
 
 -- g)  Wyświetl imię i nazwisko pracowników, których pensja zawiera się w przedziale 1500 – 3000 PLN.
@@ -281,10 +272,7 @@ WHERE p2.kwota BETWEEN cast(1500 AS money) AND cast(3000 AS money)
 
 --POPRAWIC
 
-SELECT p1.imie, p1.nazwisko, g.liczba_godzin,
-CASE
-	WHEN (g.liczba_godzin > 160) THEN liczba_godzin-160
-END AS nadgodziny
+SELECT p1.imie, p1.nazwisko
 FROM ksiegowosc.Pracownicy AS p1
 INNER JOIN ksiegowosc.Wynagrodzenie AS w
 ON p1.id_pracownika = w.id_pracownika	
@@ -316,7 +304,7 @@ INNER JOIN ksiegowosc.Pensja AS p2
 ON w.id_pensji = p2.id_pensji
 INNER JOIN ksiegowosc.Premia AS p3
 ON w.id_premii = p3.id_premii
-ORDER BY p2.kwota, p3.kwota DESC
+ORDER BY p2.kwota DESC, p3.kwota DESC
 
 
 
@@ -324,7 +312,7 @@ ORDER BY p2.kwota, p3.kwota DESC
 
 SELECT 
 	p2.stanowisko,
-	COUNT(p2.stanowisko)
+	COUNT(p2.stanowisko) AS liczba_pracownikow
 FROM ksiegowosc.Pracownicy AS p1
 INNER JOIN ksiegowosc.Wynagrodzenie AS w
 ON p1.id_pracownika = w.id_pracownika
@@ -341,11 +329,8 @@ SELECT
 	AVG(p2.kwota::numeric) AS srednia_placa,
 	MIN(p2.kwota) AS minimalna_placa,
 	MAX(p2.kwota) AS maksymalna_placa
-FROM ksiegowosc.Pracownicy AS p1
-INNER JOIN ksiegowosc.Wynagrodzenie AS w
-ON p1.id_pracownika = w.id_pracownika
-INNER JOIN ksiegowosc.Pensja AS p2
-ON w.id_pensji = p2.id_pensji
+FROM ksiegowosc.Pensja as p2
+WHERE p2.stanowisko = 'Programista'
 GROUP BY p2.stanowisko
 
 
@@ -354,11 +339,7 @@ GROUP BY p2.stanowisko
 
 SELECT 
 	SUM(p2.kwota) AS suma_wynagrodzen
-FROM ksiegowosc.Pracownicy AS p1
-INNER JOIN ksiegowosc.Wynagrodzenie AS w
-ON p1.id_pracownika = w.id_pracownika
-INNER JOIN ksiegowosc.Pensja AS p2
-ON w.id_pensji = p2.id_pensji
+FROM ksiegowosc.Pensja AS p2
 
 
 -- j) Policz sumę wynagrodzeń w ramach danego stanowiska.
@@ -367,19 +348,14 @@ ON w.id_pensji = p2.id_pensji
 SELECT 
 	p2.stanowisko,
 	SUM(p2.kwota) AS suma_wynagrodzen
-FROM ksiegowosc.Pracownicy AS p1
-INNER JOIN ksiegowosc.Wynagrodzenie AS w
-ON p1.id_pracownika = w.id_pracownika
-INNER JOIN ksiegowosc.Pensja AS p2
-ON w.id_pensji = p2.id_pensji
+FROM ksiegowosc.pensja AS p2
 GROUP BY p2.stanowisko
 
 -- g) Wyznacz liczbę premii przyznanych dla pracowników danego stanowiska
 
 SELECT 
 	p2.stanowisko,
-	COUNT(p3.id_premii) AS liczba_premii,
-	SUM(p2.kwota) AS suma_wynagrodzen
+	COUNT(p3.kwota) AS liczba_premii
 FROM ksiegowosc.Pracownicy AS p1
 INNER JOIN ksiegowosc.Wynagrodzenie AS w
 ON p1.id_pracownika = w.id_pracownika
@@ -392,7 +368,6 @@ GROUP BY p2.stanowisko
 
 -- i) Usuń wszystkich pracowników mających pensję mniejszą niż 1200 zł.
 
---DELETE POPRAWIC
 
 
 DELETE 
@@ -402,9 +377,7 @@ WHERE
 	p1.id_pracownika = w.id_pracownika AND
 	w.id_pensji = p2.id_pensji AND
 	p2.kwota < cast(1500 AS money);
-
-
--- Test Select
-
+	
+	
 SELECT *
 FROM ksiegowosc.Pracownicy
